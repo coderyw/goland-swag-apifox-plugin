@@ -5,11 +5,12 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Goland Swag Import Apifox</name>
+    <name>Swag Import Apifox</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="yw1314520b@gmail.com" url="https://github.com/coderyw/goland-swag-apifox-plugin">Personal</vendor>
-
+    <!-- 修改兼容性范围 -->
+    <idea-version since-build="242.*" />
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
@@ -33,7 +34,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="github.com.coderyw.golandswagapifoxplugin.MyAction"/>
         <!-- 注册工具窗口 -->
-        <toolWindow id="Swag2Apifox" anchor="right" factoryClass="github.com.coderyw.golandswagapifoxplugin.SwagToolWindowFactory"/>
+        <toolWindow id="Swag2Apifox" anchor="right" factoryClass="github.com.coderyw.golandswagapifoxplugin.SwagToolWindowFactory" icon="/META-INF/pluginIcon.svg"/>
         <!-- 注册配置类为服务 -->
         <projectService serviceImplementation="github.com.coderyw.golandswagapifoxplugin.PluginSettings"/>
         <projectConfigurable

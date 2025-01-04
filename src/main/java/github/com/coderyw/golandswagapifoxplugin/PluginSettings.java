@@ -18,6 +18,8 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings> 
     public String mergeSelectedOption = "AUTO_MERGE";
     public boolean isAddBasePath = false;
 
+    public String goPath = "";
+    public String goRoot = "/usr/local/go/bin";
 
     @Nullable
     @Override
@@ -33,5 +35,7 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings> 
         this.parentFolderId = state.parentFolderId;
         this.mergeSelectedOption = state.mergeSelectedOption;
         this.isAddBasePath = state.isAddBasePath;
+        this.goPath = state.goPath;
+        this.goRoot = state.goRoot;
     }
 }

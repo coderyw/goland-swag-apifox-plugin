@@ -1,12 +1,14 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M32.0845 7.94025V4H24.0203V7.9896H16.029V4H7.91553V7.94025H4V36H16.0044V32.0045C16.0058 30.9457 16.4274 29.9308 17.1766 29.1826C17.9258 28.4345 18.9412 28.0143 20 28.0143C21.0588 28.0143 22.0743 28.4345 22.8234 29.1826C23.5726 29.9308 23.9942 30.9457 23.9956 32.0045V36H36V7.94025H32.0845Z"
-          fill="url(#paint0_linear)"/>
-    <defs>
-        <linearGradient id="paint0_linear" x1="2.94192" y1="4.89955" x2="37.7772" y2="39.7345"
-                        gradientUnits="userSpaceOnUse">
-            <stop offset="0.15937" stop-color="#3BEA62"/>
-            <stop offset="0.5404" stop-color="#3C99CC"/>
-            <stop offset="0.93739" stop-color="#6B57FF"/>
-        </linearGradient>
-    </defs>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+    <!-- Swagger的"S"字母 -->
+    <path d="M50,100 C50,70 70,50 100,50 C130,50 150,70 150,100 C150,130 130,150 100,150 C70,150 50,130 50,100 Z" fill="none" stroke="#6BBE45" stroke-width="10" />
+    <path d="M70,80 C70,60 85,50 100,50 C115,50 130,60 130,80 C130,100 115,110 100,110 C85,110 70,100 70,80 Z" fill="none" stroke="#6BBE45" stroke-width="10" />
+
+    <!-- Apifox的狐狸尾巴 -->
+    <path d="M130,100 C140,110 150,120 160,130 C170,140 180,150 190,160 C200,170 190,180 180,170 C170,160 160,150 150,140 C140,130 130,120 130,100 Z" fill="#FF6F61" />
+
+    <!-- Apifox的狐狸头部 -->
+    <circle cx="130" cy="80" r="10" fill="#FF6F61" />
+    <circle cx="140" cy="75" r="5" fill="#FFFFFF" />
 </svg>

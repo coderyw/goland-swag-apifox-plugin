@@ -17,7 +17,8 @@ public class PluginSettingsForm {
     private JBTextField parentFolderIdField;
     private JComboBox<String> mergeComboBox;
     private JBCheckBox addBasePathCheckBox;
-
+    private JBTextField gopathField;
+    private JBTextField goRootField;
 //    private TextFieldWithBrowseButton filePathField;
 
     public PluginSettingsForm() {
@@ -82,7 +83,40 @@ public class PluginSettingsForm {
         p6.add(addBasePathCheckBox);
         rootPanel.add(p6);
 
+        // 配置go path
+        JPanel p7 = new JPanel();
+        p7.setLayout(new BoxLayout(p7, BoxLayout.X_AXIS)); // 水平排列
+        p7.add(new JBLabel("GoPath:"));
+        p7.add(Box.createHorizontalStrut(5)); // 添加间距
+        gopathField = new JBTextField();
+        p7.add(gopathField);
+        rootPanel.add(p7);
 
+        // 配置go root
+        JPanel p8 = new JPanel();
+        p8.setLayout(new BoxLayout(p8, BoxLayout.X_AXIS));
+        p8.add(new JBLabel("GoRoot:"));
+        p8.add(Box.createHorizontalStrut(5)); // 添加间距
+        goRootField = new JBTextField();
+        p8.add(goRootField);
+        rootPanel.add(p8);
+
+    }
+
+    public String getGoRoot() {
+        return goRootField.getText();
+    }
+
+    public void setGoRoot(String goRoot) {
+        goRootField.setText(goRoot);
+    }
+
+    public String getGopath() {
+        return gopathField.getText();
+    }
+
+    public void setGopath(String gopath) {
+        gopathField.setText(gopath);
     }
 
     public boolean isAddBasePath() {

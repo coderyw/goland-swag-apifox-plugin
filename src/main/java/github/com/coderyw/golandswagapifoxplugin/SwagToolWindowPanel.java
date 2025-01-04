@@ -4,6 +4,7 @@ package github.com.coderyw.golandswagapifoxplugin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -14,6 +15,8 @@ import com.jgoodies.common.base.Strings;
 import github.com.coderyw.model.ApifoxImportSwagger;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -102,25 +105,23 @@ public class SwagToolWindowPanel extends JPanel {
     public void runCommand(VirtualFile projectRoot) {
         // 清空日志区域
         logArea.setText("");
+        PluginSettings settings = project.getService(PluginSettings.class);
+        if (settings == null ) {
+            SwingUtilities.invokeLater(() -> {
+                Messages.showErrorDialog("Setting get error!", "Error");
+            });
+            return;
+        }
         // 启动新线程来执行命令并实时读取输出
-        new Thread(() -> {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 // 命令校验
-                swagCheck();
+                String swagCmd = swagCheck(settings.goPath, settings.goRoot);
 
                 String path = projectRoot.getPath();
-                String os = System.getProperty("os.name").toLowerCase();
                 String[] commands;
 
-                if (os.contains("win")) {
-                    commands = new String[]{"swag.exe", "init", path}; // Windows
-                } else if (os.contains("mac")) {
-                    commands = new String[]{"swag", "init", path}; // macOS
-                } else if (os.contains("nix") || os.contains("nux")) {
-                    commands = new String[]{"swag", "init", path};// Linux
-                } else {
-                    throw new UnsupportedOperationException("Unsupported operating system: " + os);
-                }
+                commands = new String[]{swagCmd, "init", path}; // Windows
 
                 // 执行命令
                 ProcessBuilder processBuilder = new ProcessBuilder(commands);
@@ -154,42 +155,46 @@ public class SwagToolWindowPanel extends JPanel {
                     Messages.showErrorDialog("Failed to run system application: " + exception.getMessage(), "Error");
                 });
             }
-        }).start();
+        });
     }
 
     // 检查文件是否存在，不存在则会通过 go install 安装
-    public void swagCheck() throws IOException {
+    public String swagCheck(String goPath, String goRoot) throws IOException {
         String osName = System.getProperty("os.name").toLowerCase();
+        Path swagPath = Paths.get(goPath).resolve("bin").resolve("swag");
 
-        Process process;
-        if (osName.contains("win")) {
-            // Windows 系统：使用 where 命令
-            process = new ProcessBuilder("where", "swag.exe").start();
-        } else {
-            // Linux/macOS 系统：使用 which 命令
-            process = new ProcessBuilder("which", "swag").start();
+
+
+        File file = new File(swagPath.toString());
+        if (file.exists() && file.isFile()) {
+            return swagPath.toString();
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String path = reader.readLine();
-        if (path != null && !path.isEmpty()) {
-            return;
-        }
+        logArea.append("No swag file: "+ swagPath + "\n");
+        Path goRun = Paths.get(goRoot).resolve("go");
         // 通过执行go install 安装
         SwingUtilities.invokeLater(() -> logArea.append("Cannot find swag command, go install swag: \n"));
-        String command = "go install github.com/swaggo/swag/cmd/swag@latest";
+        String command = goRun+" install github.com/swaggo/swag/cmd/swag@latest";
+        SwingUtilities.invokeLater(() -> logArea.append("\t"+command+ "\n"));
         ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
         processBuilder.redirectErrorStream(true);
-        process = processBuilder.start();
-        reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        Process process = processBuilder.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null) {
             String finalLine = line;
             SwingUtilities.invokeLater(() -> logArea.append("\tinstall resp: " + finalLine + "\n"));
         }
+        return swagPath.toString();
     }
 
     public void send2Apifox(VirtualFile projectRoot) {
         PluginSettings settings = project.getService(PluginSettings.class);
+        if (settings == null ) {
+            SwingUtilities.invokeLater(() -> {
+                Messages.showErrorDialog("Setting get error!", "Error");
+            });
+            return;
+        }
         // 读取文件内容
         VirtualFile folder = projectRoot.findChild("docs"); // 替换为你的文件名
         if (folder == null) {

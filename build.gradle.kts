@@ -11,7 +11,7 @@ sourceSets {
 }
 
 group = "github.com.coderyw.goland-swag-apifox-plugin"
-version = "1.0-SNAPSHOT"
+version = "1.2-SNAPSHOT"
 
 
 repositories {
@@ -26,8 +26,8 @@ dependencies {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.2.6")
-    type.set("IC") // Target IDE Platform
+    version.set("2024.3.1")
+    type.set("GO") // Target IDE Platform
 
     plugins.set(listOf())
 }
@@ -43,8 +43,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("232")
-        untilBuild.set("242.*")
+//        sinceBuild.set("232")
+//        untilBuild.set("242.*")
     }
 
     signPlugin {
