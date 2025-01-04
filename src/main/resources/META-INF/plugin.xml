@@ -5,16 +5,23 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Goland swag apifox</name>
+    <name>Goland Swag Import Apifox</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="yw1314520b@gmail.com" url="https://www.yourcompany.com">gdsgs</vendor>
+    <vendor email="yw1314520b@gmail.com" url="https://github.com/coderyw/goland-swag-apifox-plugin">Personal</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    这是一个通过goswag生成swagui风格的接口文档，然后上传到apifox的插件。
+    <p>This is a Swagui style interface document generated through Goswag and uploaded to the API Fox plugin.
+    这是一个通过goswag生成swagui风格的接口文档，然后上传到apifox的插件。</p>
+    <p> At least Swag executable files or a complete Go environment are required locally.本地至少需要swag可执行文件或者go环境完备</p>
+    <p>After installation, Apifox related configurations need to be configured in the settings. 安装后需要在设置里配置Apifox相关配置</p>
+
+    <p> 这里至少需要获取Apifox的api token和你需要上传的apifox项目id。At least the API token of Apifox and the project ID of Apifox that you need to upload need to be obtained here</p>
+
+    <image src="https://private-user-images.githubusercontent.com/45194379/400109933-5701ea99-aec7-43f4-bfd9-b5f580f21833.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzU5NTk5OTQsIm5iZiI6MTczNTk1OTY5NCwicGF0aCI6Ii80NTE5NDM3OS80MDAxMDk5MzMtNTcwMWVhOTktYWVjNy00M2Y0LWJmZDktYjVmNTgwZjIxODMzLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAxMDQlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMTA0VDAzMDEzNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWE1NWQ3NDYyMmIzNzAwMjI2MzgxMGExZDg5Y2IwZDU1NGYxYWI0MjQ5Mjg3MjAyZDJhNmY0NDY5N2RjZTg1ZTEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.M6L3BXURWDz6C78-ReRwlWTbd_CzDATCUNjQSORQvI8" width="100%" height="100%"/>
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.
