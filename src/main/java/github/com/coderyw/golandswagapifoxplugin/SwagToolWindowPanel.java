@@ -188,6 +188,10 @@ public class SwagToolWindowPanel extends JPanel {
     }
 
     public void send2Apifox(VirtualFile projectRoot) {
+        // 刷新文件
+        projectRoot.refresh(false, false);
+
+
         PluginSettings settings = project.getService(PluginSettings.class);
         if (settings == null ) {
             SwingUtilities.invokeLater(() -> {

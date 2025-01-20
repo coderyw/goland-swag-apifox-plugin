@@ -16,10 +16,10 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings> 
     public String projectId = "";
     public String parentFolderId = "";
     public String mergeSelectedOption = "AUTO_MERGE";
-    public boolean isAddBasePath = false;
+    public boolean isAddBasePath = true;
 
     public String goPath = "";
-    public String goRoot = "/usr/local/go/bin";
+    public String goRoot = "";
 
     @Nullable
     @Override
