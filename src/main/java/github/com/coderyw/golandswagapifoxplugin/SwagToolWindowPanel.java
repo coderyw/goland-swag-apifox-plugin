@@ -123,7 +123,7 @@ public class SwagToolWindowPanel extends JPanel {
 
                 File pt = PathEnvironmentVariableUtil.findInPath("swag");
                 if (pt == null) {
-                    Messages.showErrorDialog("The system is missing the swag command, use 'install github.com/swaggo/swag/cmd/swag@latest' to install\n", "Error");
+                    Messages.showErrorDialog("The system is missing the swag command, use 'go install github.com/swaggo/swag/cmd/swag@latest' to install\n", "Error");
                     return;
                 }
                 String swagCmd = pt.toPath().toString();

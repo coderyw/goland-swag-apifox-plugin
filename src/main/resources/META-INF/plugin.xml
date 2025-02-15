@@ -15,14 +15,34 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    <p>This is a Swagui style interface document generated through Goswag and uploaded to the API Fox plugin.
-    这是一个通过goswag生成swagui风格的接口文档，然后上传到apifox的插件。</p>
-    <p> At least Swag executable files or a complete Go environment are required locally.本地至少需要swag可执行文件或者go环境完备</p>
+    <h2>Swag2Apifox</h2>
+    <p>This is a Swagui style interface document generated through Goswag and uploaded to the API Fox plugin.</p>
+    <p>这是一个通过goswag生成swagui风格的接口文档，然后上传到apifox的插件。</p>
+    <h3>使用条件</h3>
+    <ul>
+        <li>Golang开发环境.</li>
+        <li>go swag可执行文件需要在环境变量中。如果没有安装可以使用下面命令安装：'go install github.com/swaggo/swag/cmd/swag@latest'</li>
+    </ul>
+    <h3>Apifox配置</h3>
+    <p>安装后可打开设置，然后找到Swag2Apifox设置，进入相关设置。</p>
+    <ul>
+        <li>API URL：这是Apifox官方接口地址，默认为 https://api.apifox.com/，无法修改。</li>
+        <li>Api Secret Key: 这是Apifox官方的api token，可以在apifox官网获取。</li>
+        <li>Project ID：接口同步到的项目id，这个必填</li>
+        <li>Parent folder ID：父级目录id，接口需要同步到哪个父级目录下。如果不填则默认根目录</li>
+        <li>Endpoint overwrite behavior：相同接口的合并策略，包含如下四种策略：Overwite existing: 覆盖现有接口 Auto merge: 自动合并  Keep existing: 保留现有的接口 Create new：创建新接口</li>
+    </ul>
+    <h3>Swag配置</h3>
+    <ul>
+        <li>Add base path：是否添加基础路由到每个接口路由上</li>
+        <li>在依赖关系文件夹中进行解析，默认情况下禁用（默认：false）：在解析实体时候是否扫描依赖。如果某些实体找不到，可以打开，不过扫描速度会变慢。</li>
+    </ul>
     <p>After installation, Apifox related configurations need to be configured in the settings. 安装后需要在设置里配置Apifox相关配置</p>
+    <p>安装后需要在设置里配置Apifox相关配置</p>
 
-    <p> 这里至少需要获取Apifox的api token和你需要上传的apifox项目id。At least the API token of Apifox and the project ID of Apifox that you need to upload need to be obtained here</p>
+    <p> At least the API token of Apifox and the project ID of Apifox that you need to upload need to be obtained here</p>
+    <p> 这里至少需要获取Apifox的api token和你需要上传的apifox项目id。</p>
 
-    <image src="https://private-user-images.githubusercontent.com/45194379/400109933-5701ea99-aec7-43f4-bfd9-b5f580f21833.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzU5NTk5OTQsIm5iZiI6MTczNTk1OTY5NCwicGF0aCI6Ii80NTE5NDM3OS80MDAxMDk5MzMtNTcwMWVhOTktYWVjNy00M2Y0LWJmZDktYjVmNTgwZjIxODMzLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAxMDQlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMTA0VDAzMDEzNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWE1NWQ3NDYyMmIzNzAwMjI2MzgxMGExZDg5Y2IwZDU1NGYxYWI0MjQ5Mjg3MjAyZDJhNmY0NDY5N2RjZTg1ZTEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.M6L3BXURWDz6C78-ReRwlWTbd_CzDATCUNjQSORQvI8" width="100%" height="100%"/>
   ]]></description>
 
     <change-notes>

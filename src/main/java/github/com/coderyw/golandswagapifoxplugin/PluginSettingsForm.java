@@ -1,7 +1,6 @@
 package github.com.coderyw.golandswagapifoxplugin;
 
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.*;
 
 
@@ -11,106 +10,195 @@ import java.util.Objects;
 
 public class PluginSettingsForm {
     private JBPanel rootPanel;
-    private JBTextField apiUrlField;
-    private JBTextField apiKeyField;
-    private JBTextField projectIdField;
-    private JBTextField parentFolderIdField;
-    private JComboBox<String> mergeComboBox;
-    private JBCheckBox addBasePathCheckBox;
-    private JBCheckBox swagPdCheckBox;
-    private JBTextField gopathField;
-    private JBTextField goRootField;
+    private JBTextField apiUrlField= new JBTextField();
+    private JBTextField apiKeyField= new JBTextField();
+    private JBTextField projectIdField= new JBTextField();
+    private JBTextField parentFolderIdField= new JBTextField();
+    private JComboBox<String> mergeComboBox=new ComboBox<>(new String[]{"Overwrite existing", "Auto merge", "Keep existing", "Create new"});
+    private JBCheckBox addBasePathCheckBox=new JBCheckBox();
+    private JBCheckBox swagPdCheckBox=new JBCheckBox();
+    private JBTextField gopathField= new JBTextField();
+    private JBTextField goRootField= new JBTextField();
 //    private TextFieldWithBrowseButton filePathField;
 
+
+    // 修改主面板布局为左对齐流式布局
+    private void buildUI() {
+        rootPanel = new JBPanel(new BorderLayout());
+
+        // 使用垂直盒子布局作为主容器
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // API配置分组
+        mainPanel.add(createFullWidthGroup("Apifox配置",
+                createStretchField("API URL:", apiUrlField),
+                createStretchField("API Key:", apiKeyField),
+                createStretchField("Project ID:", projectIdField),
+                createStretchField("Parent folder ID:", parentFolderIdField),
+                createFullWidthCombo("Endpoint overwrite behavior:", mergeComboBox)
+        ));
+
+
+        mainPanel.add(Box.createVerticalStrut(15));
+
+        // 行为配置分组
+        mainPanel.add(createFullWidthGroup("Swag配置",
+                createCheckboxRow("Add base path: ", addBasePathCheckBox),
+                createCheckboxRow("在依赖关系文件夹中进行解析，默认情况下禁用(默认：false): ", swagPdCheckBox)
+        ));
+
+        // 保证内容区域扩展
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        rootPanel.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    // 修改分组容器创建方法
+    private JPanel createFullWidthGroup(String title, JComponent... components) {
+        JPanel group = new JPanel(new BorderLayout());
+        group.setBorder(BorderFactory.createTitledBorder(title));
+
+        // 使用垂直盒子布局作为内容容器
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        for (JComponent comp : components) {
+            // 允许组件保持自然高度
+            comp.setMaximumSize(new Dimension(
+                    Integer.MAX_VALUE,
+                    comp.getPreferredSize().height // 保持组件首选高度
+            ));
+            content.add(comp);
+
+            // 添加弹性间距（可调整）
+            if (comp != components[components.length-1]) {
+                content.add(Box.createVerticalStrut(8));
+            }
+        }
+
+        // 添加底部胶水确保顶部对齐
+        content.add(Box.createVerticalGlue());
+
+        // 包裹在滚动面板中（可选）
+        JScrollPane scrollWrapper = new JScrollPane(content);
+        scrollWrapper.setBorder(BorderFactory.createEmptyBorder());
+
+        group.add(scrollWrapper, BorderLayout.CENTER);
+        return group;
+    }
+
+    // 修改字段行创建方法（移除高度限制）
+    private JPanel createStretchField(String label, JTextField field) {
+        JPanel row = new JPanel(new BorderLayout());
+        row.add(new JBLabel(label), BorderLayout.WEST);
+
+        // 仅限制最大宽度，允许高度自适应
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, field.getPreferredSize().height));
+        JPanel fieldWrapper = new JPanel(new BorderLayout());
+        fieldWrapper.add(field, BorderLayout.CENTER);
+
+        row.add(fieldWrapper, BorderLayout.CENTER);
+        return row; // 移除setMaximumSize
+    }
+
+    // 修改复选框行创建方法
+    private JPanel createCheckboxRow(String label, JCheckBox checkBox) {
+        JPanel row = new JPanel(new BorderLayout());
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        labelPanel.add(new JBLabel(label));
+
+        JPanel checkPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        checkPanel.add(checkBox);
+
+        row.add(labelPanel, BorderLayout.WEST);
+        row.add(checkPanel, BorderLayout.CENTER);
+        return row; // 移除固定高度限制
+    }
+
+    // 创建全宽下拉框
+    private JPanel createFullWidthCombo(String label, JComboBox<String> combo) {
+        JPanel row = new JPanel(new BorderLayout(5, 0));
+        row.add(new JBLabel(label), BorderLayout.WEST);
+
+        combo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 26));
+        JPanel comboWrapper = new JPanel(new BorderLayout());
+        comboWrapper.add(combo, BorderLayout.CENTER);
+
+        row.add(comboWrapper, BorderLayout.CENTER);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        return row;
+    }
+
+
+
     public PluginSettingsForm() {
-        rootPanel = new JBPanel(new GridLayout(15, 2, 1, 1)); // 使用网格布局
-        rootPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // 添加内边距
-        // API URL 输入框
-        JPanel p1 = new JPanel();
-        p1.setLayout(new BoxLayout(p1, BoxLayout.X_AXIS)); // 水平排列
-        p1.add(new JBLabel("API URL:"));
-        p1.add(Box.createHorizontalStrut(5)); // 添加间距
-        apiUrlField = new JBTextField();
-        apiUrlField.setEditable(false);
-        p1.add(apiUrlField);
-        rootPanel.add(p1);
-//        apiUrlField.setPreferredSize(new Dimension(2, 1)); // 设置宽度为 200
+        buildUI();
+    }
 
+    // 创建带标题的分组面板
+    private JPanel createGroupPanel(String title, JComponent... components) {
+        JPanel groupPanel = new JPanel(new BorderLayout());
+        groupPanel.setBorder(BorderFactory.createTitledBorder(title));
 
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
-        // API Key 输入框
-        JPanel p2 = new JPanel();
-        p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS)); // 水平排列
-        p2.add(new JBLabel("API Key:"));
-        p2.add(Box.createHorizontalStrut(5)); // 添加间距
-        apiKeyField = new JBTextField();
-        p2.add(apiKeyField);
-        rootPanel.add(p2);
+        for (JComponent comp : components) {
+            comp.setMaximumSize(new Dimension(Integer.MAX_VALUE, comp.getPreferredSize().height));
+            contentPanel.add(comp);
+            contentPanel.add(Box.createVerticalStrut(5));
+        }
 
-        // 项目id 输入框
-        JPanel p3 = new JPanel();
-        p3.setLayout(new BoxLayout(p3, BoxLayout.X_AXIS)); // 水平排列
-        p3.add(new JBLabel("Project ID:"));
-        p3.add(Box.createHorizontalStrut(5)); // 添加间距
-        projectIdField = new JBTextField();
-        p3.add(projectIdField);
-        rootPanel.add(p3);
+        groupPanel.add(contentPanel, BorderLayout.CENTER);
+        return groupPanel;
+    }
 
-        // 父级目录id 输入框
-        JPanel p4 = new JPanel();
-        p4.setLayout(new BoxLayout(p4, BoxLayout.X_AXIS)); // 水平排列
-        p4.add(new JBLabel("Parent folder ID:"));
-        p4.add(Box.createHorizontalStrut(5)); // 添加间距
-        parentFolderIdField = new JBTextField();
-        p4.add(parentFolderIdField);
-        rootPanel.add(p4);
+    // 创建带标签的输入框面板（带缩进）
+    private JPanel createFieldPanel(String labelText, JTextField textField) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
-        // 处理接口匹配行为
-        JPanel p5 = new JPanel();
-        p5.setLayout(new BoxLayout(p5, BoxLayout.X_AXIS)); // 水平排列
-        p5.add(new JBLabel("Endpoint overwrite behavior:"));
-        p5.add(Box.createHorizontalStrut(5)); // 添加间距
-        mergeComboBox = new ComboBox<>(new String[]{"Overwrite existing", "Auto merge", "Keep existing", "Create new"});
-        mergeComboBox.setSelectedIndex(1);
-        p5.add(mergeComboBox);
-        rootPanel.add(p5);
+        // 标签设置
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0, 0, 0, 10);
+        panel.add(new JBLabel(labelText), gbc);
 
-        // 是否添加basePath
-        JPanel p6 = new JPanel();
-        p6.setLayout(new BoxLayout(p6, BoxLayout.X_AXIS)); // 水平排列
-        p6.add(new JBLabel("Add base path:"));
-        p6.add(Box.createHorizontalStrut(5)); // 添加间距
-        addBasePathCheckBox = new JBCheckBox();
-        p6.add(addBasePathCheckBox);
-        rootPanel.add(p6);
+        // 输入框设置
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; // 分配额外空间
+        textField.setPreferredSize(new Dimension(300, 26)); // 设置首选宽度
+        panel.add(textField, gbc);
 
-        // 在依赖关系文件夹中进行解析，默认情况下禁用（默认：false）
-        JPanel p7 = new JPanel();
-        p7.setLayout(new BoxLayout(p7, BoxLayout.X_AXIS)); // 水平排列
-        p7.add(new JBLabel("在依赖关系文件夹中进行解析，默认情况下禁用（默认：false）:"));
-        p7.add(Box.createHorizontalStrut(5)); // 添加间距
-        swagPdCheckBox = new JBCheckBox();
-        p7.add(swagPdCheckBox);
-        rootPanel.add(p7);
+        // 添加胶水组件保证对齐
+        gbc.gridx = 2;
+        gbc.weightx = 100.0; // 右侧胶水
+        panel.add(Box.createGlue(), gbc);
 
-//        // 配置go path
-//        JPanel p7 = new JPanel();
-//        p7.setLayout(new BoxLayout(p7, BoxLayout.X_AXIS)); // 水平排列
-//        p7.add(new JBLabel("GoPath:"));
-//        p7.add(Box.createHorizontalStrut(5)); // 添加间距
-//        gopathField = new JBTextField();
-//        p7.add(gopathField);
-//        rootPanel.add(p7);
-//
-//        // 配置go root
-//        JPanel p8 = new JPanel();
-//        p8.setLayout(new BoxLayout(p8, BoxLayout.X_AXIS));
-//        p8.add(new JBLabel("GoRoot:"));
-//        p8.add(Box.createHorizontalStrut(5)); // 添加间距
-//        goRootField = new JBTextField();
-//        p8.add(goRootField);
-//        rootPanel.add(p8);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        return panel;
+    }
 
+    // 创建下拉框面板
+    private JPanel createComboPanel(String labelText, JComboBox<String> comboBox) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JBLabel(labelText), BorderLayout.WEST);
+        panel.add(comboBox, BorderLayout.CENTER);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        return panel;
+    }
+
+    // 创建复选框面板
+    private JPanel createCheckboxPanel(String labelText, JCheckBox checkBox) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JBLabel(labelText), BorderLayout.WEST);
+        panel.add(checkBox, BorderLayout.CENTER);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        return panel;
     }
 
     public void setSwagPd(boolean seleted) {
