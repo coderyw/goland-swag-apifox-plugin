@@ -11,7 +11,7 @@ sourceSets {
 }
 
 group = "github.com.coderyw.goland-swag-apifox-plugin"
-version = "1.4-SNAPSHOT"
+version = "1.5-SNAPSHOT"
 
 
 repositories {

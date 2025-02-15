@@ -18,8 +18,12 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings> 
     public String mergeSelectedOption = "AUTO_MERGE";
     public boolean isAddBasePath = true;
 
-    public String goPath = "";
-    public String goRoot = "";
+    public boolean swagPd = false;
+
+//    public String goPath = "";
+//    public String goRoot = "";
+
+
 
     @Nullable
     @Override
@@ -35,7 +39,8 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings> 
         this.parentFolderId = state.parentFolderId;
         this.mergeSelectedOption = state.mergeSelectedOption;
         this.isAddBasePath = state.isAddBasePath;
-        this.goPath = state.goPath;
-        this.goRoot = state.goRoot;
+        this.swagPd = state.swagPd;
+//        this.goPath = state.goPath;
+//        this.goRoot = state.goRoot;
     }
 }

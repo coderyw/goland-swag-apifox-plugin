@@ -3,6 +3,7 @@ package github.com.coderyw.golandswagapifoxplugin;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.Map;
+import java.util.Objects;
 
 import okhttp3.*;
 import org.json.JSONObject;
@@ -116,16 +119,45 @@ public class SwagToolWindowPanel extends JPanel {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 // 命令校验
-                String swagCmd = swagCheck(settings.goPath, settings.goRoot);
+//                String swagCmd = swagCheck();
+
+                File pt = PathEnvironmentVariableUtil.findInPath("swag");
+                if (pt == null) {
+                    Messages.showErrorDialog("The system is missing the swag command, use 'install github.com/swaggo/swag/cmd/swag@latest' to install\n", "Error");
+                    return;
+                }
+                String swagCmd = pt.toPath().toString();
+
+                File go = PathEnvironmentVariableUtil.findInPath("go");
+                if (go == null) {
+                    Messages.showErrorDialog("The system is missing the go command, please install golang first\n", "Error");
+                    return;
+                }
 
                 String path = projectRoot.getPath();
                 String[] commands;
+                if (settings.swagPd) {
+                    commands = new String[]{swagCmd, "init","--pd", path}; // Windows
+                    SwingUtilities.invokeLater(() -> logArea.append("swag init --pd "+path+"\n"));
+                }else {
+                    commands = new String[]{swagCmd, "init", path}; // Windows
+                    SwingUtilities.invokeLater(() -> logArea.append("swag init "+path+"\n"));
+                }
 
-                commands = new String[]{swagCmd, "init", path}; // Windows
 
                 // 执行命令
                 ProcessBuilder processBuilder = new ProcessBuilder(commands);
                 processBuilder.redirectErrorStream(true); // 将标准错误合并到标准输出
+
+
+                // 新增代码：获取 Go 所在目录（如 /usr/local/go/bin）
+                String goBinPath = go.getParent(); // go 可执行文件的父目录（bin 目录）
+
+                // 设置环境变量
+                Map<String, String> env = processBuilder.environment();
+                env.put("PATH", goBinPath + File.pathSeparator + System.getenv("PATH"));
+                env.put("GOROOT", new File(goBinPath).getParent());
+
                 // 设置工作目录（可选）
                 processBuilder.directory(new File(path));
 
@@ -159,37 +191,52 @@ public class SwagToolWindowPanel extends JPanel {
     }
 
     // 检查文件是否存在，不存在则会通过 go install 安装
-    public String swagCheck(String goPath, String goRoot) throws IOException {
+    public String swagCheck() throws IOException {
         String osName = System.getProperty("os.name").toLowerCase();
-        Path swagPath = Paths.get(goPath).resolve("bin").resolve("swag");
-
-
-
-        File file = new File(swagPath.toString());
-        if (file.exists() && file.isFile()) {
-            return swagPath.toString();
+//        Path swagPath = Paths.get(goPath).resolve("bin").resolve("swag");
+        File pt = PathEnvironmentVariableUtil.findInPath("swag");
+        if (pt == null) {
+            return "";
         }
-        logArea.append("No swag file: "+ swagPath + "\n");
-        Path goRun = Paths.get(goRoot).resolve("go");
-        // 通过执行go install 安装
-        SwingUtilities.invokeLater(() -> logArea.append("Cannot find swag command, go install swag: \n"));
-        String command = goRun+" install github.com/swaggo/swag/cmd/swag@latest";
-        SwingUtilities.invokeLater(() -> logArea.append("\t"+command+ "\n"));
-        ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String finalLine = line;
-            SwingUtilities.invokeLater(() -> logArea.append("\tinstall resp: " + finalLine + "\n"));
-        }
+        Path swagPath = pt.toPath();
+
+
+//
+//        File file = new File(swagPath.toString());
+//        if (file.exists() && file.isFile()) {
+//            return swagPath.toString();
+//        }
+
+
         return swagPath.toString();
+//
+//        logArea.append("No swag file: "+ swagPath + "\n");
+//        Path goRun = Paths.get(goRoot).resolve("go");
+//        // 通过执行go install 安装
+//        SwingUtilities.invokeLater(() -> logArea.append("Cannot find swag command, go install swag: \n"));
+//        String command = goRun+" install github.com/swaggo/swag/cmd/swag@latest";
+//        SwingUtilities.invokeLater(() -> logArea.append("\t"+command+ "\n"));
+//        ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
+//        processBuilder.redirectErrorStream(true);
+//        Process process = processBuilder.start();
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//        String line;
+//        while ((line = reader.readLine()) != null) {
+//            String finalLine = line;
+//            SwingUtilities.invokeLater(() -> logArea.append("\tinstall resp: " + finalLine + "\n"));
+//        }
+//        return swagPath.toString();
     }
 
     public void send2Apifox(VirtualFile projectRoot) {
         // 刷新文件
         projectRoot.refresh(false, false);
+        VirtualFile docs = projectRoot.findChild("docs");
+        if (docs == null) {
+            throw new RuntimeException("docs not found");
+        }
+        // 刷新一下文件夹
+        docs.refresh(false, true);
 
 
         PluginSettings settings = project.getService(PluginSettings.class);

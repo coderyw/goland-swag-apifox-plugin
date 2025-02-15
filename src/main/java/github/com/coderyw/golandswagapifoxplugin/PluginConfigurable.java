@@ -45,8 +45,9 @@ public class PluginConfigurable implements Configurable {
                 !settingsForm.getParentFolderId().equals(settings.parentFolderId) ||
                 !settingsForm.getMergeSelectedOption().equals(settings.mergeSelectedOption)||
                 !settingsForm.isAddBasePath() == settings.isAddBasePath||
-                !settingsForm.getGopath().equals(settings.goPath)||
-                !settingsForm.getGoRoot().equals(settings.goRoot);
+                !settingsForm.getSwagPd() == settings.swagPd;
+//                !settingsForm.getGopath().equals(settings.goPath)||
+//                !settingsForm.getGoRoot().equals(settings.goRoot);
     }
 
     @Override
@@ -64,8 +65,9 @@ public class PluginConfigurable implements Configurable {
         settings.parentFolderId = settingsForm.getParentFolderId();
         settings.mergeSelectedOption = settingsForm.getMergeSelectedOption();
         settings.isAddBasePath = settingsForm.isAddBasePath();
-        settings.goPath = settingsForm.getGopath();
-        settings.goRoot = settingsForm.getGoRoot();
+        settings.swagPd = settingsForm.getSwagPd();
+//        settings.goPath = settingsForm.getGopath();
+//        settings.goRoot = settingsForm.getGoRoot();
     }
 
     @Override
@@ -83,7 +85,8 @@ public class PluginConfigurable implements Configurable {
         settingsForm.setParentFolderId(settings.parentFolderId);
         settingsForm.setSMergeSelectedOption(settings.mergeSelectedOption);
         settingsForm.setAddBasePath(settings.isAddBasePath);
-        settingsForm.setGopath(settings.goPath);
-        settingsForm.setGoRoot(settings.goRoot);
+        settingsForm.setSwagPd(settings.swagPd);
+//        settingsForm.setGopath(settings.goPath);
+//        settingsForm.setGoRoot(settings.goRoot);
     }
 }

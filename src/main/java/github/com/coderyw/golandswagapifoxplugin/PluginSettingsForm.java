@@ -17,6 +17,7 @@ public class PluginSettingsForm {
     private JBTextField parentFolderIdField;
     private JComboBox<String> mergeComboBox;
     private JBCheckBox addBasePathCheckBox;
+    private JBCheckBox swagPdCheckBox;
     private JBTextField gopathField;
     private JBTextField goRootField;
 //    private TextFieldWithBrowseButton filePathField;
@@ -83,24 +84,41 @@ public class PluginSettingsForm {
         p6.add(addBasePathCheckBox);
         rootPanel.add(p6);
 
-        // 配置go path
+        // 在依赖关系文件夹中进行解析，默认情况下禁用（默认：false）
         JPanel p7 = new JPanel();
         p7.setLayout(new BoxLayout(p7, BoxLayout.X_AXIS)); // 水平排列
-        p7.add(new JBLabel("GoPath:"));
+        p7.add(new JBLabel("在依赖关系文件夹中进行解析，默认情况下禁用（默认：false）:"));
         p7.add(Box.createHorizontalStrut(5)); // 添加间距
-        gopathField = new JBTextField();
-        p7.add(gopathField);
+        swagPdCheckBox = new JBCheckBox();
+        p7.add(swagPdCheckBox);
         rootPanel.add(p7);
 
-        // 配置go root
-        JPanel p8 = new JPanel();
-        p8.setLayout(new BoxLayout(p8, BoxLayout.X_AXIS));
-        p8.add(new JBLabel("GoRoot:"));
-        p8.add(Box.createHorizontalStrut(5)); // 添加间距
-        goRootField = new JBTextField();
-        p8.add(goRootField);
-        rootPanel.add(p8);
+//        // 配置go path
+//        JPanel p7 = new JPanel();
+//        p7.setLayout(new BoxLayout(p7, BoxLayout.X_AXIS)); // 水平排列
+//        p7.add(new JBLabel("GoPath:"));
+//        p7.add(Box.createHorizontalStrut(5)); // 添加间距
+//        gopathField = new JBTextField();
+//        p7.add(gopathField);
+//        rootPanel.add(p7);
+//
+//        // 配置go root
+//        JPanel p8 = new JPanel();
+//        p8.setLayout(new BoxLayout(p8, BoxLayout.X_AXIS));
+//        p8.add(new JBLabel("GoRoot:"));
+//        p8.add(Box.createHorizontalStrut(5)); // 添加间距
+//        goRootField = new JBTextField();
+//        p8.add(goRootField);
+//        rootPanel.add(p8);
 
+    }
+
+    public void setSwagPd(boolean seleted) {
+        this.swagPdCheckBox.setSelected(seleted);
+    }
+
+    public boolean getSwagPd() {
+        return this.swagPdCheckBox.isSelected();
     }
 
     public String getGoRoot() {
