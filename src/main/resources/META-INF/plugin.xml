@@ -72,7 +72,7 @@
         <!-- 注册工具窗口 -->
         <toolWindow id="Swag2Apifox" anchor="right"
                     factoryClass="github.com.coderyw.golandswagapifoxplugin.SwagToolWindowFactory"
-                    icon="/META-INF/pluginIcon.svg"/>
+                    icon="/META-INF/newicon.svg"/>
         <!-- 注册配置类为服务 -->
         <projectService serviceImplementation="github.com.coderyw.golandswagapifoxplugin.PluginSettings"/>
         <projectConfigurable
