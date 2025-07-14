@@ -1,151 +1,224 @@
-# GoLand Swagger to Apifox Plugin
+# 🚀 Swag Import Apifox - Go API 文档自动同步工具
 
-一个用于GoLand的插件，可以自动生成Swagger文档并上传到Apifox。
+[![IntelliJ IDEA Plugin](https://img.shields.io/badge/IntelliJ%20IDEA-Plugin-green.svg)](https://plugins.jetbrains.com/plugin/your-plugin-id)
+[![Go Version](https://img.shields.io/badge/Go-1.16+-blue.svg)](https://golang.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 功能特性
+> 一键将 Go 项目中的 Swagger 文档自动生成并同步到 Apifox，让 API 文档管理变得简单高效！
 
-### 🚀 核心功能
-- 自动生成Swagger文档（支持YAML和JSON格式）
-- 一键上传到Apifox
-- 支持多种导入策略（覆盖、合并、保留、新建）
-- 实时日志显示
+## ✨ 主要特性
 
-### 🔧 系统兼容性优化
-- **Go版本检测**: 自动检测Go版本，要求Go 1.16+
-- **环境变量自动配置**: 自动设置GOROOT、GOPATH和PATH
-- **Swag工具检查**: 自动检测swag工具是否安装
-- **系统状态监控**: 在设置界面实时显示Go和Swag的安装状态
+- 🎯 **自动生成**：基于 Go 代码注释自动生成 Swagger 文档
+- 📤 **一键上传**：将生成的文档直接同步到 Apifox 项目
+- 🔄 **智能合并**：支持多种接口合并策略，避免重复
+- ⚙️ **灵活配置**：支持自定义上传目录和合并规则
+- 📊 **实时反馈**：详细的操作日志和结果统计
+- 🛠️ **错误诊断**：智能错误提示和解决方案
 
-### 📝 文档更新优化
-- **强制重新生成**: 每次运行前自动清理旧的swagger文件
-- **文件系统同步**: 确保读取到最新生成的文档
-- **多格式支持**: 优先使用swagger.yaml，备选swagger.json
-- **内容验证**: 检查生成的文档是否为空
+## 🚀 快速开始
 
-## 系统要求
+### 环境要求
 
-### 必需软件
-- **Go**: 版本 1.16 或更高
-- **Swag**: 最新版本 (`go install github.com/swaggo/swag/cmd/swag@latest`)
-- **GoLand**: 2022.3 或更高版本
+- ✅ **Go 环境**：Go 1.16 或更高版本
+- ✅ **Swag 工具**：自动安装或手动安装
+- ✅ **Apifox 账号**：需要 API Token 和项目 ID
+- ✅ **IntelliJ IDEA**：2022.2 或更高版本
 
-### 推荐配置
-- **Go**: 1.21+ (推荐使用最新稳定版)
-- **Swag**: v1.8.12+ (支持最新的OpenAPI规范)
+### 安装步骤
 
-## 安装配置
+1. **安装插件**
+   - 在 IntelliJ IDEA 中打开 `Settings/Preferences` → `Plugins`
+   - 搜索 "Swag Import Apifox" 并安装
+   - 重启 IDE
 
-### 1. 安装插件
-1. 下载插件文件
-2. 在GoLand中打开 `File` → `Settings` → `Plugins`
-3. 点击齿轮图标 → `Install Plugin from Disk`
-4. 选择下载的插件文件
+2. **安装 Swag 工具**
+   ```bash
+   go install github.com/swaggo/swag/cmd/swag@latest
+   ```
 
-### 2. 配置Apifox
-1. 打开 `File` → `Settings` → `Tools` → `My Plugin Settings`
-2. 填写以下信息：
-   - **API URL**: `https://api.apifox.com/` (默认)
-   - **API Key**: 从Apifox获取的API Token
-   - **Project ID**: 目标项目的ID
-   - **Parent folder ID**: (可选) 指定导入的父文件夹ID
+3. **配置 Apifox**
+   - 打开 `Settings/Preferences` → `Tools` → `Swag2Apifox`
+   - 填入 API Token 和项目 ID
 
-### 3. 检查系统环境
-在设置界面中，插件会自动检查：
-- ✅ Go版本兼容性
-- ✅ Swag工具安装状态
-- 点击"检查系统环境"按钮可手动刷新状态
+### 使用示例
 
-## 使用方法
+#### 1. 添加 Swagger 注释
 
-### 基本使用
-1. 在Go项目中添加Swagger注释
-2. 点击工具栏的插件图标或使用快捷键
-3. 确认生成和上传操作
-4. 查看日志输出确认成功
+```go
+// @title My API
+// @version 1.0
+// @description API 服务描述
+// @host localhost:8080
+// @BasePath /api/v1
 
-### 高级配置
-在设置中可以配置：
-- **Endpoint overwrite behavior**: 选择导入策略
-  - `Overwrite existing`: 覆盖现有接口
-  - `Auto merge`: 自动合并
-  - `Keep existing`: 保留现有
-  - `Create new`: 创建新的
-- **Add base path**: 是否添加基础路径
-- **Swag PD**: 在依赖关系文件夹中进行解析
-
-## 故障排除
-
-### 常见问题
-
-#### 1. Go版本不兼容
-```
-错误: Go version too old, requires Go 1.16+
-解决: 升级Go到1.16或更高版本
+// @Summary 获取用户信息
+// @Description 根据用户ID获取详细信息
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Param id path int true "用户ID"
+// @Success 200 {object} User
+// @Router /users/{id} [get]
+func getUser(c *gin.Context) {
+    // 实现代码
+}
 ```
 
-#### 2. Swag工具未安装
+#### 2. 生成并上传文档
+
+1. 打开右侧工具窗口 `Swag2Apifox`
+2. 点击 `Generate & Upload` 按钮
+3. 查看操作日志，确认上传成功
+
+## ⚙️ 配置说明
+
+### Apifox 配置
+
+| 配置项 | 说明 | 必填 |
+|--------|------|------|
+| **API Secret Key** | Apifox API Token，在[个人设置](https://apifox.com/web/account/tokens)中获取 | ✅ |
+| **Project ID** | 目标项目 ID，在项目设置中查看 | ✅ |
+| **Parent Folder ID** | 父级目录 ID，不填则同步到根目录 | ❌ |
+| **Endpoint Overwrite Behavior** | 接口合并策略 | ❌ |
+| **Add Base Path** | 是否在接口路径前添加基础路径 | ❌ |
+
+### 接口合并策略
+
+- 🔄 **Overwrite Existing**：覆盖现有接口
+- 🔗 **Auto Merge**：自动合并（推荐）
+- 💾 **Keep Existing**：保留现有接口
+- ➕ **Create New**：创建新接口
+
+### Swag 配置
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| **Parse Dependency** | 是否扫描依赖包中的实体 | false |
+
+## 📖 使用教程
+
+### 完整工作流程
+
+1. **准备 Go 项目**
+   ```bash
+   # 确保项目有 go.mod 文件
+   go mod init myproject
+   ```
+
+2. **添加 Swagger 依赖**
+   ```bash
+   go get github.com/swaggo/swag/cmd/swag
+   go get github.com/swaggo/gin-swagger
+   go get github.com/swaggo/files
+   ```
+
+3. **编写 API 注释**
+   ```go
+   package main
+
+   import (
+       "github.com/gin-gonic/gin"
+       swaggerFiles "github.com/swaggo/files"
+       ginSwagger "github.com/swaggo/gin-swagger"
+       _ "yourproject/docs" // 导入生成的docs包
+   )
+
+   // @title Your API
+   // @version 1.0
+   // @description Your API description
+   // @host localhost:8080
+   // @BasePath /api/v1
+   func main() {
+       r := gin.Default()
+       
+       // Swagger文档路由
+       r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+       
+       r.Run(":8080")
+   }
+   ```
+
+4. **配置插件并上传**
+
+### 最佳实践
+
+1. **注释规范**
+   - 使用清晰的 API 描述
+   - 正确设置请求/响应格式
+   - 添加适当的标签分组
+
+2. **配置建议**
+   - 使用 "Auto Merge" 策略避免重复
+   - 合理设置父级目录组织接口
+   - 开启详细日志便于调试
+
+3. **错误处理**
+   - 查看详细日志定位问题
+   - 检查网络连接和权限
+   - 验证配置信息正确性
+
+## 🔧 常见问题
+
+### Q: 提示 "swag command not found"
+**A:** 运行以下命令安装 swag 工具：
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
 ```
-错误: The system is missing the swag command
-解决: 运行 go install github.com/swaggo/swag/cmd/swag@latest
-```
 
-#### 3. 文档更新不及时
-```
-问题: 上传的文档是旧版本
-解决: 插件已优化，会自动清理旧文件并强制重新生成
-```
+### Q: 提示 "No swagger file found"
+**A:** 检查以下几点：
+1. Go 代码中的 Swagger 注释是否正确
+2. 查看详细日志定位具体问题
+3. 确保项目结构正确
 
-#### 4. 环境变量问题
-```
-问题: Go命令找不到或环境变量错误
-解决: 插件会自动配置GOROOT、GOPATH和PATH环境变量
-```
+### Q: 上传失败
+**A:** 检查以下配置：
+1. API Token 是否正确
+2. Project ID 是否存在
+3. 网络连接是否正常
+4. 项目权限是否足够
 
-### 调试步骤
-1. 检查设置界面的系统环境状态
-2. 查看工具窗口的详细日志输出
-3. 确认Go代码中的Swagger注释格式正确
-4. 验证Apifox的API Token和Project ID
+### Q: 接口重复或冲突
+**A:** 调整合并策略：
+1. 使用 "Auto Merge" 自动合并
+2. 使用 "Create New" 创建新接口
+3. 检查接口路径是否重复
 
-## 更新日志
+## 📚 相关资源
 
-### v1.5 (当前版本)
-- ✅ 添加Go版本兼容性检查
-- ✅ 优化环境变量自动配置
-- ✅ 强制重新生成swagger文档
-- ✅ 改进文件系统同步机制
-- ✅ 添加系统状态监控界面
-- ✅ 增强错误处理和用户反馈
+- 📖 [Swag 官方文档](https://github.com/swaggo/swag)
+- 📖 [Apifox 帮助文档](https://apifox.com/help)
+- 📖 [Go Swagger 教程](https://github.com/swaggo/swag#declarative-comments-format)
+- 🐛 [问题反馈](https://github.com/coderyw/goland-swag-apifox-plugin/issues)
 
-### v1.4
-- 基础功能实现
-- Apifox集成
-- 基本配置界面
+## 🎯 适用场景
 
-## 开发信息
+- Go 微服务 API 文档管理
+- 团队协作开发中的接口同步
+- API 文档版本控制
+- 前后端接口对接
+- 自动化文档生成
 
-### 技术栈
-- **语言**: Java 17
-- **框架**: IntelliJ Platform SDK
-- **构建工具**: Gradle
-- **HTTP客户端**: OkHttp
-- **JSON处理**: Gson
+## 🤝 贡献指南
 
-### 项目结构
-```
-src/main/java/github/com/coderyw/golandswagapifoxplugin/
-├── MyAction.java              # 主动作类
-├── PluginConfigurable.java    # 插件配置
-├── PluginSettings.java        # 设置数据模型
-├── PluginSettingsForm.java    # 设置界面
-├── SwagToolWindowFactory.java # 工具窗口工厂
-└── SwagToolWindowPanel.java   # 工具窗口面板
-```
+欢迎提交 Issue 和 Pull Request！
 
-## 贡献
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开 Pull Request
 
-欢迎提交Issue和Pull Request来改进这个插件。
+## 📄 许可证
 
-## 许可证
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
-MIT License
+## 🙏 致谢
+
+- [Swag](https://github.com/swaggo/swag) - Go Swagger 文档生成工具
+- [Apifox](https://apifox.com/) - API 文档管理平台
+- [IntelliJ Platform](https://plugins.jetbrains.com/) - 插件开发平台
+
+---
+
+⭐ 如果这个项目对你有帮助，请给它一个星标！

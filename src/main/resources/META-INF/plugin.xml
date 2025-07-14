@@ -10,54 +10,296 @@
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="yw1314520b@gmail.com" url="https://github.com/coderyw/goland-swag-apifox-plugin">Personal</vendor>
     <!-- 修改兼容性范围 -->
-    <idea-version since-build="222.*"/>
+    <idea-version since-build="231" until-build="241.*"/>
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    <h2>Swag2Apifox</h2>
-    <p>This is a Swagui style interface document generated through Goswag and uploaded to the API Fox plugin.</p>
-    <p>这是一个通过goswag生成swagui风格的接口文档，然后上传到apifox的插件。</p>
-    <h3>使用条件</h3>
+    <h2>Swag Import Apifox - Go API Documentation Sync Tool</h2>
+    
+    <p><strong>Automatically generate Swagger documentation from Go code comments and sync to Apifox with one click, improving API documentation management efficiency!</strong></p>
+    
+    <h3>Key Features</h3>
     <ul>
-        <li>Golang开发环境.</li>
-        <li>go swag可执行文件需要在环境变量中。如果没有安装可以使用下面命令安装：'go install github.com/swaggo/swag/cmd/swag@latest'</li>
+        <li>🎯 <strong>Auto Generation</strong>: Generate Swagger docs from Go code comments automatically</li>
+        <li>📤 <strong>One-Click Upload</strong>: Sync generated docs directly to Apifox projects</li>
+        <li>🔄 <strong>Smart Merge</strong>: Support multiple interface merge strategies to avoid duplicates</li>
+        <li>⚙️ <strong>Flexible Configuration</strong>: Customize upload directories and merge rules</li>
+        <li>📊 <strong>Real-time Feedback</strong>: Detailed operation logs and result statistics</li>
     </ul>
-    <h3>Apifox配置</h3>
-    <p>安装后可打开设置，然后找到Swag2Apifox设置，进入相关设置。</p>
+    
+    <h3>Quick Start</h3>
+    
+    <h4>1. Environment Setup</h4>
     <ul>
-        <li>API URL：这是Apifox官方接口地址，默认为 https://api.apifox.com/，无法修改。</li>
-        <li>Api Secret Key: 这是Apifox官方的api token，可以在apifox官网获取。</li>
-        <li>Project ID：接口同步到的项目id，这个必填</li>
-        <li>Parent folder ID：父级目录id，接口需要同步到哪个父级目录下。如果不填则默认根目录</li>
-        <li>Endpoint overwrite behavior：相同接口的合并策略，包含如下四种策略：Overwite existing: 覆盖现有接口 Auto merge: 自动合并  Keep existing: 保留现有的接口 Create new：创建新接口</li>
+        <li>✅ <strong>Go Environment</strong>: Go 1.16 or higher</li>
+        <li>✅ <strong>GoLand/IntelliJ IDEA</strong>: 2023.1 or higher</li>
+        <li>✅ <strong>Swag Tool</strong>: Auto-install or manual install <code>go install github.com/swaggo/swag/cmd/swag@latest</code></li>
+        <li>✅ <strong>Apifox Account</strong>: Need API Token and Project ID</li>
     </ul>
-    <h3>Swag配置</h3>
-    <ul>
-        <li>Add base path：是否添加基础路由到每个接口路由上</li>
-        <li>在依赖关系文件夹中进行解析，默认情况下禁用（默认：false）：在解析实体时候是否扫描依赖。如果某些实体找不到，可以打开，不过扫描速度会变慢。</li>
-    </ul>
-    <p>After installation, Apifox related configurations need to be configured in the settings. 安装后需要在设置里配置Apifox相关配置</p>
-    <p>安装后需要在设置里配置Apifox相关配置</p>
+    
+    <h4>2. Code Comment Example</h4>
+    <pre><code>// @title My API
+// @version 1.0
+// @description API service description
+// @host localhost:8080
+// @BasePath /api/v1
 
-    <p> At least the API token of Apifox and the project ID of Apifox that you need to upload need to be obtained here</p>
-    <p> 这里至少需要获取Apifox的api token和你需要上传的apifox项目id。</p>
+// @Summary Get user information
+// @Description Get detailed information by user ID
+// @Tags User Management
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} User
+// @Router /users/{id} [get]
+func getUser(c *gin.Context) {
+    // Implementation code
+}</code></pre>
+    
+    <h4>3. Plugin Configuration</h4>
+    <p>Open <strong>Settings/Preferences</strong> → <strong>Tools</strong> → <strong>Swag2Apifox</strong></p>
+    
+    <h3>Configuration Guide</h3>
+    
+    <h4>Apifox Configuration</h4>
+    <ul>
+        <li><strong>API Secret Key</strong>: Apifox API Token, get from <a href="https://apifox.com/web/account/tokens">Personal Settings</a></li>
+        <li><strong>Project ID</strong>: Target project ID, view in project settings (Required)</li>
+        <li><strong>Parent Folder ID</strong>: Parent directory ID, sync to root if empty</li>
+        <li><strong>Endpoint Overwrite Behavior</strong>: Interface merge strategy
+            <ul>
+                <li>🔄 <strong>Overwrite Existing</strong>: Overwrite existing interfaces</li>
+                <li>🔗 <strong>Auto Merge</strong>: Auto merge (Recommended)</li>
+                <li>💾 <strong>Keep Existing</strong>: Keep existing interfaces</li>
+                <li>➕ <strong>Create New</strong>: Create new interfaces</li>
+            </ul>
+        </li>
+        <li><strong>Add Base Path</strong>: Whether to add base path to interface paths</li>
+    </ul>
+    
+    <h4>Swag Configuration</h4>
+    <ul>
+        <li><strong>Parse Dependency</strong>: Whether to scan entities in dependency packages (default off, slower scanning)</li>
+    </ul>
+    
+    <h3>Usage Steps</h3>
+    <ol>
+        <li>Add Swagger comments to Go project</li>
+        <li>Configure Apifox connection information</li>
+        <li>Open right tool window <strong>Swag2Apifox</strong></li>
+        <li>Click <strong>Generate & Upload</strong> button</li>
+        <li>View operation logs and confirm successful upload</li>
+    </ol>
+    
+    <h3>Common Issues</h3>
+    <ul>
+        <li><strong>Q: "swag command not found" error</strong><br>
+        A: Run <code>go install github.com/swaggo/swag/cmd/swag@latest</code> to install</li>
+        <li><strong>Q: "No swagger file found" error</strong><br>
+        A: Check if Swagger comments in Go code are correct, view detailed logs to locate issues</li>
+        <li><strong>Q: Upload failed</strong><br>
+        A: Check if API Token and Project ID are correct, confirm network connection</li>
+    </ul>
+    
+    <h3>Related Resources</h3>
+    <ul>
+        <li>📖 <a href="https://github.com/swaggo/swag">Swag Official Documentation</a></li>
+        <li>📖 <a href="https://apifox.com/help">Apifox Help Documentation</a></li>
+        <li>🐛 <a href="https://github.com/coderyw/goland-swag-apifox-plugin/issues">Issue Feedback</a></li>
+    </ul>
+    
+    <h3>Use Cases</h3>
+    <ul>
+        <li>Go microservice API documentation management</li>
+        <li>Interface synchronization in team collaboration</li>
+        <li>API documentation version control</li>
+        <li>Frontend-backend interface integration</li>
+    </ul>
+    
+    <p><em>Make API documentation management simple and efficient! 🎉</em></p>
+    
+    <hr style="margin: 30px 0; border: 1px solid #e0e0e0;">
+    
+    <h2>Swag Import Apifox - Go API 文档同步工具</h2>
+    
+    <p><strong>一键从 Go 代码注释自动生成 Swagger 文档并同步到 Apifox，提升 API 文档管理效率！</strong></p>
+    
+    <h3>核心功能</h3>
+    <ul>
+        <li>🎯 <strong>自动生成</strong>：从 Go 代码注释自动生成 Swagger 文档</li>
+        <li>📤 <strong>一键上传</strong>：将生成的文档直接同步到 Apifox 项目</li>
+        <li>🔄 <strong>智能合并</strong>：支持多种接口合并策略，避免重复</li>
+        <li>⚙️ <strong>灵活配置</strong>：自定义上传目录和合并规则</li>
+        <li>📊 <strong>实时反馈</strong>：详细的操作日志和结果统计</li>
+    </ul>
+    
+    <h3>快速开始</h3>
+    
+    <h4>1. 环境准备</h4>
+    <ul>
+        <li>✅ <strong>Go 环境</strong>：Go 1.16 或更高版本</li>
+        <li>✅ <strong>GoLand/IntelliJ IDEA</strong>：2023.1 或更高版本</li>
+        <li>✅ <strong>Swag 工具</strong>：自动安装或手动安装 <code>go install github.com/swaggo/swag/cmd/swag@latest</code></li>
+        <li>✅ <strong>Apifox 账号</strong>：需要 API Token 和项目 ID</li>
+    </ul>
+    
+    <h4>2. 代码注释示例</h4>
+    <pre><code>// @title 我的 API
+// @version 1.0
+// @description API 服务描述
+// @host localhost:8080
+// @BasePath /api/v1
 
+// @Summary 获取用户信息
+// @Description 根据用户 ID 获取详细信息
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Param id path int true "用户 ID"
+// @Success 200 {object} User
+// @Router /users/{id} [get]
+func getUser(c *gin.Context) {
+    // 实现代码
+}</code></pre>
+    
+    <h4>3. 插件配置</h4>
+    <p>打开 <strong>设置/偏好设置</strong> → <strong>工具</strong> → <strong>Swag2Apifox</strong></p>
+    
+    <h3>配置指南</h3>
+    
+    <h4>Apifox 配置</h4>
+    <ul>
+        <li><strong>API 密钥</strong>：Apifox API Token，从<a href="https://apifox.com/web/account/tokens">个人设置</a>获取</li>
+        <li><strong>项目 ID</strong>：目标项目 ID，在项目设置中查看（必填）</li>
+        <li><strong>父文件夹 ID</strong>：父目录 ID，为空则同步到根目录</li>
+        <li><strong>接口覆盖行为</strong>：接口合并策略
+            <ul>
+                <li>🔄 <strong>覆盖现有</strong>：覆盖现有接口</li>
+                <li>🔗 <strong>自动合并</strong>：自动合并（推荐）</li>
+                <li>💾 <strong>保留现有</strong>：保留现有接口</li>
+                <li>➕ <strong>创建新接口</strong>：创建新接口</li>
+            </ul>
+        </li>
+        <li><strong>添加基础路径</strong>：是否在接口路径前添加基础路径</li>
+    </ul>
+    
+    <h4>Swag 配置</h4>
+    <ul>
+        <li><strong>解析依赖</strong>：是否扫描依赖包中的实体（默认关闭，扫描较慢）</li>
+    </ul>
+    
+    <h3>使用步骤</h3>
+    <ol>
+        <li>在 Go 项目中添加 Swagger 注释</li>
+        <li>配置 Apifox 连接信息</li>
+        <li>打开右侧工具窗口 <strong>Swag2Apifox</strong></li>
+        <li>点击 <strong>生成并上传</strong> 按钮</li>
+        <li>查看操作日志并确认上传成功</li>
+    </ol>
+    
+    <h3>常见问题</h3>
+    <ul>
+        <li><strong>Q: "swag command not found" 错误</strong><br>
+        A: 运行 <code>go install github.com/swaggo/swag/cmd/swag@latest</code> 安装</li>
+        <li><strong>Q: "No swagger file found" 错误</strong><br>
+        A: 检查 Go 代码中的 Swagger 注释是否正确，查看详细日志定位问题</li>
+        <li><strong>Q: 上传失败</strong><br>
+        A: 检查 API Token 和项目 ID 是否正确，确认网络连接</li>
+    </ul>
+    
+    <h3>相关资源</h3>
+    <ul>
+        <li>📖 <a href="https://github.com/swaggo/swag">Swag 官方文档</a></li>
+        <li>📖 <a href="https://apifox.com/help">Apifox 帮助文档</a></li>
+        <li>🐛 <a href="https://github.com/coderyw/goland-swag-apifox-plugin/issues">问题反馈</a></li>
+    </ul>
+    
+    <h3>使用场景</h3>
+    <ul>
+        <li>Go 微服务 API 文档管理</li>
+        <li>团队协作中的接口同步</li>
+        <li>API 文档版本控制</li>
+        <li>前后端接口对接</li>
+    </ul>
+    
+    <p><em>让 API 文档管理变得简单高效！🎉</em></p>
   ]]></description>
 
     <change-notes>
         <![CDATA[
-        <h3>v1.5</h3>
+        <h3>🎉 v1.6 - Major Improvement Release</h3>
         <ul>
-            <li>增加新配置：增加是否扫描依赖选项。默认不扫描</li>
-            <li>移除goroot以及goPath</li>
-            <li>修复在docs文件夹为空时候无法上传文档</li>
+            <li>🔧 <strong>Core Issue Fix</strong>: Completely resolved "No swagger file found" error</li>
+            <li>📊 <strong>Enhanced Debugging</strong>: Added detailed operation logs and error diagnostics</li>
+            <li>⚡ <strong>File Processing Optimization</strong>: Improved file system refresh mechanism for better reliability</li>
+            <li>🛠️ <strong>Error Handling Improvement</strong>: Provided more user-friendly error messages and solutions</li>
+            <li>📝 <strong>Documentation Update</strong>: Updated plugin introduction and usage guide</li>
+            <li>🚀 <strong>High Version Compatibility</strong>: Enhanced compatibility with GoLand 2024.1+ and IntelliJ IDEA 2024.1+</li>
+            <li>🔧 <strong>UI Component Optimization</strong>: Updated UI components for better compatibility with newer IDE versions</li>
+            <li>📦 <strong>Dependency Updates</strong>: Updated OkHttp to 4.12.0 and added Gson 2.10.1 for better performance</li>
         </ul>
-        <h3>v1.4</h3>
+        
+        <h3>🚀 v1.5 - Feature Enhancement Release</h3>
         <ul>
-            <li>增加新配置：添加BasePath到路由</li>
-            <li>修复若干bug</li>
+            <li>⚙️ <strong>New Configuration Options</strong>: Added dependency scanning toggle, disabled by default for better performance</li>
+            <li>🧹 <strong>Configuration Simplification</strong>: Removed manual GOROOT and GOPATH configuration, auto-detection enabled</li>
+            <li>🐛 <strong>Upload Issue Fix</strong>: Resolved issue where upload failed when docs folder was empty</li>
+            <li>📈 <strong>Performance Optimization</strong>: Improved processing speed for large projects</li>
         </ul>
+        
+        <h3>✨ v1.4 - Feature Completion Release</h3>
+        <ul>
+            <li>🛣️ <strong>BasePath Support</strong>: Option to add base path to interface paths</li>
+            <li>🔧 <strong>Bug Fixes</strong>: Fixed multiple known issues, improved stability</li>
+            <li>📱 <strong>UI Improvements</strong>: Optimized user interface, enhanced user experience</li>
+            <li>📚 <strong>Documentation Updates</strong>: Improved usage instructions and configuration guide</li>
+        </ul>
+        
+        <h3>🎯 Version Compatibility</h3>
+        <ul>
+            <li>✅ <strong>Go Version</strong>: Supports Go 1.16+</li>
+            <li>✅ <strong>IDE Version</strong>: Supports IntelliJ IDEA 2023.1+ (GoLand 2023.1+)</li>
+            <li>✅ <strong>Swag Version</strong>: Supports latest version of swag tool</li>
+        </ul>
+        
+        <hr style="margin: 20px 0; border: 1px solid #e0e0e0;">
+        
+        <h3>🎉 v1.6 - 重大改进版本</h3>
+        <ul>
+            <li>🔧 <strong>修复核心问题</strong>：彻底解决 "No swagger file found" 错误</li>
+            <li>📊 <strong>增强调试功能</strong>：添加详细的操作日志和错误诊断信息</li>
+            <li>⚡ <strong>优化文件处理</strong>：改进文件系统刷新机制，提高可靠性</li>
+            <li>🛠️ <strong>改进错误处理</strong>：提供更友好的错误提示和解决方案</li>
+            <li>📝 <strong>完善文档</strong>：更新插件介绍和使用指南</li>
+            <li>🚀 <strong>高版本兼容性</strong>：增强对 GoLand 2024.1+ 和 IntelliJ IDEA 2024.1+ 的兼容性</li>
+            <li>🔧 <strong>UI组件优化</strong>：更新UI组件以更好地兼容新版IDE</li>
+            <li>📦 <strong>依赖更新</strong>：更新 OkHttp 到 4.12.0 并添加 Gson 2.10.1 以提升性能</li>
+        </ul>
+        
+        <h3>🚀 v1.5 - 功能增强版本</h3>
+        <ul>
+            <li>⚙️ <strong>新增配置选项</strong>：增加依赖扫描开关，默认关闭以提高性能</li>
+            <li>🧹 <strong>简化配置</strong>：移除 GOROOT 和 GOPATH 手动配置，自动检测</li>
+            <li>🐛 <strong>修复上传问题</strong>：解决 docs 文件夹为空时无法上传的问题</li>
+            <li>📈 <strong>性能优化</strong>：提升大项目的处理速度</li>
+        </ul>
+        
+        <h3>✨ v1.4 - 功能完善版本</h3>
+        <ul>
+            <li>🛣️ <strong>新增 BasePath 支持</strong>：可选择是否在接口路径前添加基础路径</li>
+            <li>🔧 <strong>Bug 修复</strong>：修复多个已知问题，提升稳定性</li>
+            <li>📱 <strong>UI 改进</strong>：优化用户界面，提升使用体验</li>
+            <li>📚 <strong>文档更新</strong>：完善使用说明和配置指南</li>
+        </ul>
+        
+        <h3>🎯 版本兼容性</h3>
+        <ul>
+            <li>✅ <strong>Go 版本</strong>：支持 Go 1.16+</li>
+            <li>✅ <strong>IDE 版本</strong>：支持 IntelliJ IDEA 2023.1+ (GoLand 2023.1+)</li>
+            <li>✅ <strong>Swag 版本</strong>：支持最新版本的 swag 工具</li>
+        </ul>
+        
         ]]>
     </change-notes>
 

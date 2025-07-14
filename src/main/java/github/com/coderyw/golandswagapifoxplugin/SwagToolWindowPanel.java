@@ -90,7 +90,7 @@ public class SwagToolWindowPanel extends JPanel {
         // 日志区：JTextPane+StyledDocument
         logPane = new JTextPane();
         logPane.setEditable(false);
-        logPane.setBackground(getEditorBackground());
+        logPane.setBackground(getThemeBackground());
         logPane.setForeground(JBColor.foreground());
         logPane.setFont(getConsoleFont());
         logPane.setBorder(JBUI.Borders.empty(4));
@@ -98,8 +98,8 @@ public class SwagToolWindowPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(logPane);
         scrollPane.setBorder(JBUI.Borders.empty());
-        scrollPane.setBackground(getEditorBackground());
-        scrollPane.getViewport().setBackground(getEditorBackground());
+        scrollPane.setBackground(getThemeBackground());
+        scrollPane.getViewport().setBackground(getThemeBackground());
 
         add(toolbarPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
@@ -267,6 +267,18 @@ public class SwagToolWindowPanel extends JPanel {
     private Color getEditorBackground() {
         EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
         return scheme.getDefaultBackground();
+    }
+    
+    /**
+     * 获取IDE当前主题背景色（兼容更高版本）
+     */
+    private Color getThemeBackground() {
+        try {
+            return UIUtil.getPanelBackground();
+        } catch (Exception e) {
+            // 如果获取失败，使用默认背景色
+            return new Color(248, 248, 248);
+        }
     }
 
     /**

@@ -11,7 +11,7 @@ sourceSets {
 }
 
 group = "github.com.coderyw.goland-swag-apifox-plugin"
-version = "1.5-SNAPSHOT"
+version = "1.6-SNAPSHOT"
 
 
 repositories {
@@ -19,14 +19,15 @@ repositories {
 }
 
 dependencies {
-    implementation("com.squareup.okhttp3:okhttp:4.9.3") // 添加 OkHttp 依赖
+    implementation("com.squareup.okhttp3:okhttp:4.12.0") // 更新 OkHttp 依赖
     implementation("org.json:json:20231013")
+    implementation("com.google.code.gson:gson:2.10.1") // 添加 Gson 依赖
 }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.1")
+    version.set("2024.1")
     type.set("GO") // Target IDE Platform
 
     plugins.set(listOf())
