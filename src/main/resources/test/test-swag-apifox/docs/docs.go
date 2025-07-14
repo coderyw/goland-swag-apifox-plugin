@@ -434,7 +434,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http", "https"},
 	Title:            "GCash Payment API",
-	Description:      "GCash支付和提现相关API服务",
+	Description:      "GCash支付和提现相关API服务 - 更新版本",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

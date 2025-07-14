@@ -5,7 +5,7 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "GCash支付和提现相关API服务",
+        "description": "GCash支付和提现相关API服务 - 更新版本",
         "title": "GCash Payment API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {

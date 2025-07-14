@@ -402,6 +402,19 @@ public class SwagToolWindowPanel extends JPanel {
                 } else {
                     appendToLog("docs.go not found, skipping deletion\n");
                 }
+                
+                // 等待文件删除完成
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                
+                // 验证文件是否真的被删除
+                appendToLog("Verifying file deletion:\n");
+                appendToLog("  swagger.yaml still exists: " + swaggerYaml.exists() + "\n");
+                appendToLog("  swagger.json still exists: " + swaggerJson.exists() + "\n");
+                appendToLog("  docs.go still exists: " + docsGo.exists() + "\n");
             } else {
                 appendToLog("No existing docs directory found\n");
             }
@@ -521,7 +534,7 @@ public class SwagToolWindowPanel extends JPanel {
 
                 // 等待文件生成完成
                 appendToLog("Waiting for swagger files to be generated...\n");
-                Thread.sleep(2000); // 增加等待时间
+                Thread.sleep(3000); // 增加等待时间
 
                 // 验证文件是否生成
                 File docsDir = new File(path, "docs");
@@ -541,12 +554,30 @@ public class SwagToolWindowPanel extends JPanel {
                 appendToLog("  swagger.yaml exists: " + swaggerYaml.exists() + "\n");
                 appendToLog("  swagger.json exists: " + swaggerJson.exists() + "\n");
                 
+                // 检查文件大小
+                if (swaggerYaml.exists()) {
+                    long yamlSize = swaggerYaml.length();
+                    appendToLog("  swagger.yaml size: " + yamlSize + " bytes\n");
+                }
+                if (swaggerJson.exists()) {
+                    long jsonSize = swaggerJson.length();
+                    appendToLog("  swagger.json size: " + jsonSize + " bytes\n");
+                }
+                
                 if (!swaggerYaml.exists() && !swaggerJson.exists()) {
                     appendToLog("ERROR: No swagger files were generated\n");
                     SwingUtilities.invokeLater(() -> {
                         Messages.showErrorDialog("No swagger files were generated. Please check your Go code annotations.", "Error");
                     });
                     return;
+                }
+
+                // 检查文件内容是否为空
+                if (swaggerYaml.exists() && swaggerYaml.length() == 0) {
+                    appendToLog("WARNING: swagger.yaml is empty\n");
+                }
+                if (swaggerJson.exists() && swaggerJson.length() == 0) {
+                    appendToLog("WARNING: swagger.json is empty\n");
                 }
 
                 appendToLog("Swagger files generated successfully, proceeding to upload...\n");
@@ -690,7 +721,26 @@ public class SwagToolWindowPanel extends JPanel {
                     return;
                 }
 
+                // 在读取文件内容前，再次强制刷新文件系统
+                appendToLog("Refreshing file system before reading content...\n");
+                fileToUse.refresh(false, false);
+                
+                // 等待文件系统刷新完成
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                
+                // 检查文件最后修改时间
+                java.io.File physicalFile = new java.io.File(fileToUse.getPath());
+                if (physicalFile.exists()) {
+                    long lastModified = physicalFile.lastModified();
+                    appendToLog("File last modified time: " + new java.util.Date(lastModified) + "\n");
+                }
+                
                 // 读取文件内容
+                appendToLog("Reading file content...\n");
                 String fileContent = readFileContent(fileToUse);
                 
                 // 检查文件内容是否为空
@@ -703,6 +753,10 @@ public class SwagToolWindowPanel extends JPanel {
                 }
 
                 appendToLog("Swagger file content length: " + fileContent.length() + " characters\n");
+                
+                // 输出文件内容的前100个字符用于调试
+                String preview = fileContent.length() > 100 ? fileContent.substring(0, 100) + "..." : fileContent;
+                appendToLog("File content preview: " + preview + "\n");
 
                 // 在后台线程中发送HTTP请求
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -786,7 +840,17 @@ public class SwagToolWindowPanel extends JPanel {
     public String readFileContent(@NotNull VirtualFile file) throws IOException {
         return com.intellij.openapi.application.ReadAction.compute(() -> {
             try {
-                byte[] contentBytes = file.contentsToByteArray();
+                // 强制刷新文件内容，确保读取最新内容
+                file.refresh(false, false);
+                
+                // 使用文件系统直接读取，避免VirtualFile缓存问题
+                java.io.File physicalFile = new java.io.File(file.getPath());
+                if (!physicalFile.exists()) {
+                    throw new IOException("File does not exist: " + file.getPath());
+                }
+                
+                // 读取文件内容
+                byte[] contentBytes = java.nio.file.Files.readAllBytes(physicalFile.toPath());
                 return new String(contentBytes, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new RuntimeException(e);
