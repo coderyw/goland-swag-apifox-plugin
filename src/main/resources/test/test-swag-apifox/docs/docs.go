@@ -15,11 +15,70 @@ const docTemplate = `{
             "url": "http://www.swagger.io/support",
             "email": "support@swagger.io"
         },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/balance/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "获取指定用户的GCash账户余额",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "账户管理"
+                ],
+                "summary": "获取用户余额",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.BalanceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/mini/payment": {
             "post": {
                 "description": "GCash小程序支付",
@@ -44,6 +103,326 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/payment": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "发起GCash支付交易",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "支付"
+                ],
+                "summary": "发起支付",
+                "parameters": [
+                    {
+                        "description": "支付请求",
+                        "name": "payment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.PaymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.PaymentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/transaction/{transaction_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "查询指定交易的当前状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "交易查询"
+                ],
+                "summary": "获取交易状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "交易ID",
+                        "name": "transaction_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.TransactionStatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/withdrawal": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "申请从GCash账户提现到银行账户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "提现"
+                ],
+                "summary": "提现申请",
+                "parameters": [
+                    {
+                        "description": "提现请求",
+                        "name": "withdrawal",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.WithdrawalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.WithdrawalResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.BalanceResponse": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number",
+                    "example": 1000.5
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "PHP"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "12345"
+                }
+            }
+        },
+        "main.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Bad Request"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Invalid request parameters"
+                }
+            }
+        },
+        "main.PaymentRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "currency",
+                "merchant",
+                "order_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 500
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "PHP"
+                },
+                "merchant": {
+                    "type": "string",
+                    "example": "Shop123"
+                },
+                "order_id": {
+                    "type": "string",
+                    "example": "ORD123456"
+                }
+            }
+        },
+        "main.PaymentResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 500
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "PHP"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "pending"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TXN123456789"
+                }
+            }
+        },
+        "main.TransactionStatus": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 500
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2024-01-15T10:30:00Z"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "PHP"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "completed"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "TXN123456789"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2024-01-15T10:35:00Z"
+                }
+            }
+        },
+        "main.WithdrawalRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "bank_account",
+                "bank_name",
+                "currency"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "bank_account": {
+                    "type": "string",
+                    "example": "1234567890"
+                },
+                "bank_name": {
+                    "type": "string",
+                    "example": "BDO"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "PHP"
+                }
+            }
+        },
+        "main.WithdrawalResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "bank_account": {
+                    "type": "string",
+                    "example": "1234567890"
+                },
+                "currency": {
+                    "type": "string",
+                    "example": "PHP"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "processing"
+                },
+                "withdrawal_id": {
+                    "type": "string",
+                    "example": "WD123456789"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
@@ -52,10 +431,10 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/go/gcash",
-	Schemes:          []string{},
-	Title:            "GCash payment API",
-	Description:      "GCash支付和提现相关api服务",
+	BasePath:         "/api/v1",
+	Schemes:          []string{"http", "https"},
+	Title:            "GCash Payment API",
+	Description:      "GCash支付和提现相关API服务",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

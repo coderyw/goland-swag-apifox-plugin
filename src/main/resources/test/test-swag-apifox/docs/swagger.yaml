@@ -1,15 +1,169 @@
-basePath: /api/go/gcash
+basePath: /api/v1
+definitions:
+  main.BalanceResponse:
+    properties:
+      balance:
+        example: 1000.5
+        type: number
+      currency:
+        example: PHP
+        type: string
+      user_id:
+        example: "12345"
+        type: string
+    type: object
+  main.ErrorResponse:
+    properties:
+      error:
+        example: Bad Request
+        type: string
+      message:
+        example: Invalid request parameters
+        type: string
+    type: object
+  main.PaymentRequest:
+    properties:
+      amount:
+        example: 500
+        type: number
+      currency:
+        example: PHP
+        type: string
+      merchant:
+        example: Shop123
+        type: string
+      order_id:
+        example: ORD123456
+        type: string
+    required:
+    - amount
+    - currency
+    - merchant
+    - order_id
+    type: object
+  main.PaymentResponse:
+    properties:
+      amount:
+        example: 500
+        type: number
+      currency:
+        example: PHP
+        type: string
+      status:
+        example: pending
+        type: string
+      transaction_id:
+        example: TXN123456789
+        type: string
+    type: object
+  main.TransactionStatus:
+    properties:
+      amount:
+        example: 500
+        type: number
+      created_at:
+        example: "2024-01-15T10:30:00Z"
+        type: string
+      currency:
+        example: PHP
+        type: string
+      status:
+        example: completed
+        type: string
+      transaction_id:
+        example: TXN123456789
+        type: string
+      updated_at:
+        example: "2024-01-15T10:35:00Z"
+        type: string
+    type: object
+  main.WithdrawalRequest:
+    properties:
+      amount:
+        example: 1000
+        type: number
+      bank_account:
+        example: "1234567890"
+        type: string
+      bank_name:
+        example: BDO
+        type: string
+      currency:
+        example: PHP
+        type: string
+    required:
+    - amount
+    - bank_account
+    - bank_name
+    - currency
+    type: object
+  main.WithdrawalResponse:
+    properties:
+      amount:
+        example: 1000
+        type: number
+      bank_account:
+        example: "1234567890"
+        type: string
+      currency:
+        example: PHP
+        type: string
+      status:
+        example: processing
+        type: string
+      withdrawal_id:
+        example: WD123456789
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: GCash支付和提现相关api服务
+  description: GCash支付和提现相关API服务
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: GCash payment API
+  title: GCash Payment API
   version: "1.0"
 paths:
+  /balance/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定用户的GCash账户余额
+      parameters:
+      - description: 用户ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.BalanceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取用户余额
+      tags:
+      - 账户管理
   /mini/payment:
     post:
       consumes:
@@ -27,4 +181,108 @@ paths:
       summary: 小程序支付
       tags:
       - 小程序
+  /payment:
+    post:
+      consumes:
+      - application/json
+      description: 发起GCash支付交易
+      parameters:
+      - description: 支付请求
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/main.PaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.PaymentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 发起支付
+      tags:
+      - 支付
+  /transaction/{transaction_id}:
+    get:
+      consumes:
+      - application/json
+      description: 查询指定交易的当前状态
+      parameters:
+      - description: 交易ID
+        in: path
+        name: transaction_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.TransactionStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 获取交易状态
+      tags:
+      - 交易查询
+  /withdrawal:
+    post:
+      consumes:
+      - application/json
+      description: 申请从GCash账户提现到银行账户
+      parameters:
+      - description: 提现请求
+        in: body
+        name: withdrawal
+        required: true
+        schema:
+          $ref: '#/definitions/main.WithdrawalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.WithdrawalResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: 提现申请
+      tags:
+      - 提现
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

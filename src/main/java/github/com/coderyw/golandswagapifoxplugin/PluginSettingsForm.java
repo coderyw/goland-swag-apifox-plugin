@@ -1,12 +1,17 @@
 package github.com.coderyw.golandswagapifoxplugin;
 
-import com.intellij.openapi.ui.ComboBox;
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
 import com.intellij.ui.components.*;
-
+import com.intellij.openapi.application.ApplicationManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PluginSettingsForm {
     private JBPanel rootPanel;
@@ -14,13 +19,18 @@ public class PluginSettingsForm {
     private JBTextField apiKeyField= new JBTextField();
     private JBTextField projectIdField= new JBTextField();
     private JBTextField parentFolderIdField= new JBTextField();
-    private JComboBox<String> mergeComboBox=new ComboBox<>(new String[]{"Overwrite existing", "Auto merge", "Keep existing", "Create new"});
+    private JComboBox<String> mergeComboBox=new JComboBox<>(new String[]{"Overwrite existing", "Auto merge", "Keep existing", "Create new"});
     private JBCheckBox addBasePathCheckBox=new JBCheckBox();
     private JBCheckBox swagPdCheckBox=new JBCheckBox();
     private JBTextField gopathField= new JBTextField();
     private JBTextField goRootField= new JBTextField();
+    
+    // 系统状态显示组件
+    private JBLabel goStatusLabel = new JBLabel("Go: 检查中...");
+    private JBLabel swagStatusLabel = new JBLabel("Swag: 检查中...");
+    private JBLabel vmOptionsStatusLabel = new JBLabel("VM Options: 检查中...");
+    private JButton checkSystemButton = new JButton("检查系统环境");
 //    private TextFieldWithBrowseButton filePathField;
-
 
     // 修改主面板布局为左对齐流式布局
     private void buildUI() {
@@ -30,6 +40,13 @@ public class PluginSettingsForm {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
+        // 系统检查分组
+        mainPanel.add(createFullWidthGroup("系统环境检查",
+                createSystemCheckPanel()
+        ));
+
+        mainPanel.add(Box.createVerticalStrut(15));
+
         // API配置分组
         mainPanel.add(createFullWidthGroup("Apifox配置",
                 createStretchField("API URL:", apiUrlField),
@@ -38,7 +55,6 @@ public class PluginSettingsForm {
                 createStretchField("Parent folder ID:", parentFolderIdField),
                 createFullWidthCombo("Endpoint overwrite behavior:", mergeComboBox)
         ));
-
 
         mainPanel.add(Box.createVerticalStrut(15));
 
@@ -52,6 +68,200 @@ public class PluginSettingsForm {
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         rootPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // 初始化系统检查
+        checkSystemEnvironment();
+    }
+
+    // 创建系统检查面板
+    private JPanel createSystemCheckPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        
+        // 状态显示区域
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
+        statusPanel.add(goStatusLabel);
+        statusPanel.add(Box.createVerticalStrut(5));
+        statusPanel.add(swagStatusLabel);
+        statusPanel.add(Box.createVerticalStrut(5));
+        statusPanel.add(vmOptionsStatusLabel);
+        
+        // 检查按钮
+        checkSystemButton.addActionListener(e -> checkSystemEnvironment());
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(checkSystemButton);
+        
+        panel.add(statusPanel, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+
+    // 检查系统环境
+    private void checkSystemEnvironment() {
+        goStatusLabel.setText("Go: 检查中...");
+        swagStatusLabel.setText("Swag: 检查中...");
+        vmOptionsStatusLabel.setText("VM Options: 检查中...");
+        checkSystemButton.setEnabled(false);
+        
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // 检查Go
+            checkGoEnvironment();
+            
+            // 检查Swag
+            checkSwagEnvironment();
+            
+            // 检查VM选项
+            checkVMOptionsEnvironment();
+            
+            SwingUtilities.invokeLater(() -> checkSystemButton.setEnabled(true));
+        });
+    }
+
+    // 检查Go环境
+    private void checkGoEnvironment() {
+        try {
+            File goExecutable = PathEnvironmentVariableUtil.findInPath("go");
+            if (goExecutable == null) {
+                SwingUtilities.invokeLater(() -> {
+                    goStatusLabel.setText("Go: ❌ 未安装");
+                    goStatusLabel.setForeground(Color.RED);
+                });
+                return;
+            }
+
+            // 获取Go版本
+            ProcessBuilder processBuilder = new ProcessBuilder(goExecutable.getAbsolutePath(), "version");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+            }
+            
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                SwingUtilities.invokeLater(() -> {
+                    goStatusLabel.setText("Go: ❌ 版本检查失败");
+                    goStatusLabel.setForeground(Color.RED);
+                });
+                return;
+            }
+            
+            String versionOutput = output.toString().trim();
+            
+            // 解析Go版本号
+            Pattern pattern = Pattern.compile("go(\\d+)\\.(\\d+)");
+            Matcher matcher = pattern.matcher(versionOutput);
+            
+            if (matcher.find()) {
+                int major = Integer.parseInt(matcher.group(1));
+                int minor = Integer.parseInt(matcher.group(2));
+                
+                // 检查是否支持最低版本要求 (Go 1.16+)
+                if (major > 1 || (major == 1 && minor >= 16)) {
+                    SwingUtilities.invokeLater(() -> {
+                        goStatusLabel.setText("Go: ✅ " + versionOutput + " (兼容)");
+                        goStatusLabel.setForeground(new Color(0, 128, 0)); // 深绿色
+                    });
+                } else {
+                    SwingUtilities.invokeLater(() -> {
+                        goStatusLabel.setText("Go: ⚠️ " + versionOutput + " (版本过低，需要1.16+)");
+                        goStatusLabel.setForeground(Color.ORANGE);
+                    });
+                }
+            } else {
+                SwingUtilities.invokeLater(() -> {
+                    goStatusLabel.setText("Go: ⚠️ " + versionOutput + " (版本解析失败)");
+                    goStatusLabel.setForeground(Color.ORANGE);
+                });
+            }
+        } catch (Exception e) {
+            SwingUtilities.invokeLater(() -> {
+                goStatusLabel.setText("Go: ❌ 检查失败: " + e.getMessage());
+                goStatusLabel.setForeground(Color.RED);
+            });
+        }
+    }
+
+    // 检查Swag环境
+    private void checkSwagEnvironment() {
+        try {
+            File swagExecutable = PathEnvironmentVariableUtil.findInPath("swag");
+            if (swagExecutable == null) {
+                SwingUtilities.invokeLater(() -> {
+                    swagStatusLabel.setText("Swag: ❌ 未安装");
+                    swagStatusLabel.setForeground(Color.RED);
+                });
+                return;
+            }
+
+            // 获取Swag版本
+            ProcessBuilder processBuilder = new ProcessBuilder(swagExecutable.getAbsolutePath(), "version");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+            }
+            
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                SwingUtilities.invokeLater(() -> {
+                    swagStatusLabel.setText("Swag: ❌ 版本检查失败");
+                    swagStatusLabel.setForeground(Color.RED);
+                });
+                return;
+            }
+            
+            String versionOutput = output.toString().trim();
+            
+            SwingUtilities.invokeLater(() -> {
+                swagStatusLabel.setText("Swag: ✅ " + versionOutput);
+                swagStatusLabel.setForeground(new Color(0, 128, 0)); // 深绿色
+            });
+        } catch (Exception e) {
+            SwingUtilities.invokeLater(() -> {
+                swagStatusLabel.setText("Swag: ❌ 检查失败: " + e.getMessage());
+                swagStatusLabel.setForeground(Color.RED);
+            });
+        }
+    }
+
+    // 检查VM选项环境
+    private void checkVMOptionsEnvironment() {
+        try {
+            // 初始化VM选项设置
+            VMOptionsHelper.initializeVMOptions();
+            
+            // 检查VM选项配置
+            boolean isConfigured = VMOptionsHelper.isVMOptionsConfigured();
+            String status = VMOptionsHelper.getVMOptionsStatus();
+            
+            SwingUtilities.invokeLater(() -> {
+                if (isConfigured) {
+                    vmOptionsStatusLabel.setText("VM Options: ✅ 已配置");
+                    vmOptionsStatusLabel.setForeground(new Color(0, 128, 0)); // 深绿色
+                } else {
+                    vmOptionsStatusLabel.setText("VM Options: ⚠️ " + status);
+                    vmOptionsStatusLabel.setForeground(Color.ORANGE);
+                }
+            });
+        } catch (Exception e) {
+            SwingUtilities.invokeLater(() -> {
+                vmOptionsStatusLabel.setText("VM Options: ❌ 检查失败: " + e.getMessage());
+                vmOptionsStatusLabel.setForeground(Color.RED);
+            });
+        }
     }
 
     // 修改分组容器创建方法

@@ -19,6 +19,9 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings> 
     public boolean isAddBasePath = true;
 
     public boolean swagPd = false;
+    
+    // 添加VM选项相关设置
+    public boolean suppressVMOptionsWarning = true;
 
 //    public String goPath = "";
 //    public String goRoot = "";
@@ -40,6 +43,7 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings> 
         this.mergeSelectedOption = state.mergeSelectedOption;
         this.isAddBasePath = state.isAddBasePath;
         this.swagPd = state.swagPd;
+        this.suppressVMOptionsWarning = state.suppressVMOptionsWarning;
 //        this.goPath = state.goPath;
 //        this.goRoot = state.goRoot;
     }
