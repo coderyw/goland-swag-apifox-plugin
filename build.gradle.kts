@@ -28,9 +28,9 @@ dependencies {
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     version.set("2024.1")
-    type.set("GO") // Target IDE Platform
+    type.set("GO") // Target IntelliJ IDEA Community Edition for broader compatibility
 
-    plugins.set(listOf())
+    plugins.set(listOf("org.jetbrains.plugins.go"))
 
     updateSinceUntilBuild.set(false)
 }
@@ -47,7 +47,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("231")
-        untilBuild.set("241.*")
+        untilBuild.set("252.*")
     }
 
     signPlugin {
